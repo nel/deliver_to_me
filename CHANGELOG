@@ -1,0 +1,7 @@
+* 0.2
+	Rewriting emails through environment file is not that practical in multi developer environments, so I implements targets
+	Targets are just scripts that return a list of emails. Implemented target right now is :current_git_user_email, it returns git config user.email
+	as the recipients of the emails. Very practical during development with git scm. You could also implement a target to look for email in a yml file I.E.
+
+* 0.1
+	first release, rewrite to cc and bcc, but you need to specify the emails to be used in the environments file 

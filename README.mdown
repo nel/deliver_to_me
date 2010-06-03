@@ -1,0 +1,110 @@
+DeliverToMe
+===========
+
+This plugin fulfill a simple need: in development or preproduction you will be able to control the recipients of any mail sent by your app whatever the real recipients are. This plugin provide a way to override the real to: cc: and bcc: recipients and replace them dynamicly at delivery time by yours. Just use it for development and preprod environment, it won't mess or brake your production app nor your tests but will ease your day to day life and those of yours testers. 
+
+Why ?
+==========
+
+In development and in preproduction you often have to test email sending.
+
+In real world situation, it's not your own email that is the recipient of the email sent by your app, so you have to hack your db or use a custom smtp to get the emails. 
+
+* Have you configured and run a local smtp that redefine email recipients ? Ain't you bored at explaining your teammate how to do the same ? Do you really need any daemon running on your brand new macbook ?
+* Haven't you ever send an unwanted email while testing against your production database ? Are you really sure ?
+* Don't you have someone that want to test your release in preprod and check what real email looks like whithout bothering real user (or worse you :) ) ?
+* Aren't your bored at running that rake task that override all email in your db and replacing them by yours to avoid bothering your user ?
+* Aren't you using a custom smtp and don't know what was the real recipient before you override the email headers ?
+* tired of tail -f your log file to check whether this f***ing email looks as expected
+
+If it's the case this plugin is for you.
+
+What ?
+==========
+
+The purpose of this plugin is to rewrite the to, cc and bcc of the email sent through actionmailer and replace it by the recipients you choose. 
+
+Example: 
+
+you send an email through action mailer with following headers
+
+	from: my@app.com
+	to: undisclosed-recipients
+	bcc: user1@domain1.com, user2@domain2.com
+
+If you choose to configure the plugin to deliver to dev1@app.com and dev2@app.com the only mail that will be sent will have the following header:
+
+	from: my@app.com
+	to: dev1@app.com, dev2@app.com
+
+The body will be the same than the original email. You can also add the list the original recipients in the email (currently this option only work in text email).
+
+The delivery is handled by :smtp and :sendmail just use config.action_mailer.smtp_settings or config.action_mailer.sendmail_settings as usual and choose the :delivery_method in config.action_mailer.my_settings. :test is also supported but it's real case purpose is for this plugin test
+
+This plugin is unobtrusive, it won't change anything in your code unless you load it explicitly in your environment, so it won't break anything in production or test.
+
+Code is available at: git://github.com/Nel/deliver_to_me.git
+
+Usage
+=======
+
+In config/environments/development.rb:
+
+	ActionMailer::Base.send :include, DeliverToMe
+
+	config.action_mailer.delivery_method = :my
+
+	config.action_mailer.my_settings = {
+	      :recipients => 'nel@w3fu.com',
+	      :delivery_method => :smtp,
+	      :real_recipients_in_body => true
+	}
+
+	config.action_mailer.smtp_settings = {
+	   :address => 'smtp.free.fr',
+	   :port => 25,
+	   :domain => 'free.fr'
+	}
+
+or
+
+	ActionMailer::Base.send :include, DeliverToMe
+
+	config.action_mailer.delivery_method = :my
+
+	config.action_mailer.my_settings = {
+	      :recipients => 'nel@w3fu.com',
+	      :delivery_method => :sendmail,
+	      :real_recipients_in_body => true
+	}
+
+	config.action_mailer.sendmail_settings = {
+	  :location       => '/usr/sbin/sendmail',
+	  :arguments      => '-i -t'
+	}
+
+It will send all emails send via action to mailer to nel@w3fu.com using the delivery method smtp or sendmail.
+
+Targets
+=======
+
+This plugin is great but has a drawback: you have to configure the target email in environments/development which is often in the scm and shared among several developer. So this modification gets on your way when you have to commit as you must not commit it...
+
+That's why I implement the notion of Target which is basiquely a dynamic recipient, instead of specifying a list of emails in config.action_mailer.my_settings[:recipients], you can specify a target symbol. 
+
+It will looks for corresponding Targets::(camelized string) module of class and execute the static method "get" to return a list of recipients.
+
+Exemple:
+
+	config.action_mailer.my_settings = {
+	      :recipients => :current_git_user_email,
+	      :delivery_method => :sendmail,
+	      :real_recipients_in_body => true
+	}
+
+
+The current_git_user_email Target will use the current git config user.email as the recipients !!! If Git is your scm you won't have to customize this file and every developer will get its own email. Isn't it great ?
+
+You can develop your own target to fit your need. Example get recipients in db, in flat files, built it from hostname or whatever you want.
+
+Copyright (c) 2008 Renaud Nel Morvan (http://w3fu.com), released under the MIT license
