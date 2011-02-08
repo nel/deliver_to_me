@@ -41,10 +41,23 @@ module DeliverToMe
   
     # alter email body, should not work with multipart email
     def my_alter_email_body!(mail, string)
+      return my_alter_email_body_multipart!(mail, string) if mail.multipart?
+      
       current_body = mail.body
       mail.body = current_body + "\n#{string}"
     end
-  
+
+    def my_alter_email_body_multipart!(mail, string)
+      current_body = "###############   Multipart email   ###############\n"
+      mail.parts.each do |part|
+        current_body << "###############  -#{part.content_type}   ###############\n"
+        current_body << part.body
+        current_body << "\n\n"
+      end
+      current_body << "\n###############\n"
+      mail.body = current_body + "\n#{string}"
+    end
+
     # take a hash of recipients array and return a string
     def my_recipients_presenter(recipients_hash)
       %W(to cc bcc).inject('') do |ret, header|
