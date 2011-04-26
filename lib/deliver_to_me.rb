@@ -41,13 +41,13 @@ module DeliverToMe
   
     # alter email body, should not work with multipart email
     def my_alter_email_body!(mail, string)
-      return my_alter_email_body_multipart!(mail, string) if mail.multipart?
+      return my_alter_multipart_email!(mail, string) if mail.multipart?
       
       current_body = mail.body
       mail.body = current_body + "\n#{string}"
     end
 
-    def my_alter_email_body_multipart!(mail, string)
+    def my_alter_multipart_email!(mail, string)
       current_body = "###############   Multipart email   ###############\n"
       mail.parts.each do |part|
         current_body << "###############  -#{part.content_type}   ###############\n"
@@ -55,6 +55,11 @@ module DeliverToMe
         current_body << "\n\n"
       end
       current_body << "\n###############\n"
+
+      mail.content_type = 'text/plain'
+      mail['Content-Type'] = 'text/plain'
+      mail.parts.delete_if{true}
+
       mail.body = current_body + "\n#{string}"
     end
 
