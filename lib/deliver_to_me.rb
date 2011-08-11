@@ -20,7 +20,11 @@ module DeliverToMe
       raise e if raise_delivery_errors
     end
   end
-  
+
+  def perform_delivery_none(mail)
+    true
+  end
+
   private
     # force delivered email to be send to my recipients
     def my_override_destinations!(mail)
