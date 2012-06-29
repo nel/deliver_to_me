@@ -77,7 +77,7 @@ module DeliverToMe
     # return a hash of formatted email array
     def my_parse_recipients(mail)
       %W(to cc bcc).inject({}) do |acc, header|
-        acc[header] = mail.header_string(header, []).collect {|address| address.to_s}
+        acc[header] = [mail.header_string(header, [])].flatten.collect {|address| address.to_s}
         acc
       end
     end

@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'test/unit'
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'rubygems'
@@ -16,7 +17,7 @@ ActionMailer::Base.my_settings = {
 class MyTestDelivery < ActionMailer::Base
   def love_letter
     from '"Renaud (nel) Morvan"<nel@externaltrain.org>'
-    recipients '"Jésus"<listener@externaldrain.org>'
+    recipients '"Jsus"<listener@externaldrain.org>'
     cc 'mydog@externalrain.org'
     bcc 'yourdog@externalslain.org'
     sent_on Time.local(2004, 12, 12)

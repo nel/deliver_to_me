@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__),'/test_helpers')
 
 class DeliverToMeTest < Test::Unit::TestCase
@@ -64,7 +65,7 @@ class DeliverToMeTest < Test::Unit::TestCase
     @expected.to = 'postmaster@localhost'
     @expected.cc = nil
     @expected.bcc = nil
-    @expected.body=  @expected.body << "\nto 1:\n\"Jésus\" <listener@externaldrain.org>\ncc 1:\nmydog@externalrain.org\nbcc 1:\nyourdog@externalslain.org\n"
+    @expected.body=  @expected.body << "\nto 1:\nJsus <listener@externaldrain.org>\ncc 1:\nmydog@externalrain.org\nbcc 1:\nyourdog@externalslain.org\n"
     assert_equal @expected.encoded, ActionMailer::Base.deliveries.first.encoded
   end
   
@@ -95,7 +96,7 @@ class DeliverToMeTest < Test::Unit::TestCase
   private
     def mail_fixture
       expected = new_mail
-      expected.to      = '"Jésus"<listener@externaldrain.org>'
+      expected.to      = '"Jsus"<listener@externaldrain.org>'
       expected.cc      = 'mydog@externalrain.org'
       expected.bcc     = 'yourdog@externalslain.org'
       expected.subject = '=?utf-8?Q?Blop_=C3=A9_=C3=A7?='
