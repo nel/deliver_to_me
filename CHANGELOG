@@ -1,3 +1,5 @@
+* 0.3
+    Using Mail gem instead of TMail
 * 0.2
 	Rewriting emails through environment file is not that practical in multi developer environments, so I implements targets
 	Targets are just scripts that return a list of emails. Implemented target right now is :current_git_user_email, it returns git config user.email

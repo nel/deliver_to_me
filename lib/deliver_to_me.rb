@@ -48,7 +48,7 @@ module DeliverToMe
       return my_alter_multipart_email!(mail, string) if mail.multipart?
       
       current_body = mail.body
-      mail.body = current_body + "\n#{string}"
+      mail.body = current_body.to_s + "\n#{string}"
     end
 
     def my_alter_multipart_email!(mail, string)
@@ -77,7 +77,7 @@ module DeliverToMe
     # return a hash of formatted email array
     def my_parse_recipients(mail)
       %W(to cc bcc).inject({}) do |acc, header|
-        acc[header] = [mail.header_string(header, [])].flatten.collect {|address| address.to_s}
+        acc[header] = [mail.header[header]].flatten.collect {|address| address.to_s}
         acc
       end
     end

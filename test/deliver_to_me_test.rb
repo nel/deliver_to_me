@@ -22,7 +22,7 @@ class DeliverToMeTest < Test::Unit::TestCase
     end
 
     assert_not_nil ActionMailer::Base.deliveries.first
-    assert_equal @expected.encoded, ActionMailer::Base.deliveries.first.encoded
+    assert_mails_equal @expected.encoded, ActionMailer::Base.deliveries.first.encoded
   end
   
   def test_should_have_default_options
@@ -65,11 +65,11 @@ class DeliverToMeTest < Test::Unit::TestCase
     @expected.to = 'postmaster@localhost'
     @expected.cc = nil
     @expected.bcc = nil
-    @expected.body=  @expected.body << "\nto 1:\nJsus <listener@externaldrain.org>\ncc 1:\nmydog@externalrain.org\nbcc 1:\nyourdog@externalslain.org\n"
-    assert_equal @expected.encoded, ActionMailer::Base.deliveries.first.encoded
+    @expected.body=  @expected.body.to_s << "\nto 1:\nJsus <listener@externaldrain.org>\ncc 1:\nmydog@externalrain.org\nbcc 1:\nyourdog@externalslain.org\n"
+    assert_mails_equal @expected.to_s, ActionMailer::Base.deliveries.first
   end
-  
-  def test_should_perform_smtp_delivery   
+
+  def test_should_perform_smtp_delivery
     ActionMailer::Base.my_settings = {
       :recipients => 'postmaster@localhost',
       :delivery_method => :smtp,
@@ -94,6 +94,11 @@ class DeliverToMeTest < Test::Unit::TestCase
   end
 
   private
+    def assert_mails_equal(mail1, mail2)
+      stripped_mails = [mail1, mail2].map{|m| m.to_s.gsub(/message\-id[^\r\n]+\r\n/i, "")}
+      assert_equal stripped_mails.first, stripped_mails.last
+    end
+
     def mail_fixture
       expected = new_mail
       expected.to      = '"Jsus"<listener@externaldrain.org>'
@@ -103,14 +108,16 @@ class DeliverToMeTest < Test::Unit::TestCase
       expected.body    = "externalbrain is da host, café çélà, hail to Rick Olson, Ezra, Nick, Jamis and so much more"
       expected.from    = '"Renaud (nel) Morvan"<nel@externaltrain.org>'
       expected.date    = Time.local 2004, 12, 12
+      expected.message_id = "502cfcf19ff5b_1249c3fd4cd034cd888579@yourdomain.com"
       expected
     end
     
     def new_mail( charset="utf-8" )
-      mail = TMail::Mail.new
+      mail = ::Mail.new
       mail.mime_version = "1.0"
       if charset
-        mail.set_content_type "text", "plain", { "charset" => charset }
+        mail.content_type = 'text/plain'
+        mail.charset = charset
       end
       mail
     end

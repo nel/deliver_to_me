@@ -3,6 +3,12 @@ DeliverToMe
 
 This plugin fulfill a simple need: in development or preproduction you will be able to control the recipients of any mail sent by your app whatever the real recipients are. This plugin provide a way to override the real to: cc: and bcc: recipients and replace them dynamicly at delivery time by yours. Just use it for development and preprod environment, it won't mess or brake your production app nor your tests but will ease your day to day life and those of yours testers. 
 
+ActionMailer version
+==========
+
+This plugin works now with the patched version of `ActionMailer`, that uses `mail` gem instead of `tmail`.
+Use the branch `rails-2.3.14` for the standard `ActionMailer`.
+
 Why ?
 ==========
 
