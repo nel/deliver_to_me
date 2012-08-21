@@ -55,7 +55,7 @@ module DeliverToMe
       current_body = "###############   Multipart email   ###############\n"
       mail.parts.each do |part|
         current_body << "###############  -#{part.content_type}   ###############\n"
-        current_body << part.body
+        current_body << part.body.decoded
         current_body << "\n\n"
       end
       current_body << "\n###############\n"
